@@ -96,7 +96,7 @@ public:
 
   void run() { submit_single_task(); }
 
-  static std::string getBenchmarkName(BenchmarkArgs& args) { return "Runtime_DAGTaskThroughput_SingleTask"; }
+  static std::string getBenchmarkName(BenchmarkArgs& args) { return "Runtime_DAGTaskThroughput_SingleTask_" + std::to_string(args.problem_size); }
 };
 
 
@@ -106,7 +106,7 @@ public:
 
   void run() { submit_basic_parallel_for(); }
 
-  static std::string getBenchmarkName(BenchmarkArgs& args) { return "Runtime_DAGTaskThroughput_BasicParallelFor"; }
+  static std::string getBenchmarkName(BenchmarkArgs& args) { return "Runtime_DAGTaskThroughput_BasicParallelFor_" + std::to_string(args.problem_size); }
 };
 
 
@@ -116,7 +116,7 @@ public:
 
   void run() { submit_ndrange_parallel_for(); }
 
-  static std::string getBenchmarkName(BenchmarkArgs& args) { return "Runtime_DAGTaskThroughput_NDRangeParallelFor"; }
+  static std::string getBenchmarkName(BenchmarkArgs& args) { return "Runtime_DAGTaskThroughput_NDRangeParallelFor_" + std::to_string(args.problem_size); }
 };
 
 
@@ -127,7 +127,7 @@ public:
   void run() { submit_hierarchical_parallel_for(); }
 
   static std::string getBenchmarkName(BenchmarkArgs& args) {
-    return "Runtime_DAGTaskThroughput_HierarchicalParallelFor";
+    return "Runtime_DAGTaskThroughput_HierarchicalParallelFor_" + std::to_string(args.problem_size);
   }
 };
 
