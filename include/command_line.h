@@ -22,9 +22,15 @@ namespace detail {
 template <class T>
 inline T simple_cast(const std::string& s) {
   std::stringstream sstr{s};
-  T result;
-  sstr >> result;
-  return result;
+  if constexpr (std::is_same_v<T, std::string>) {
+        std::string result;
+        std::getline(sstr, result, '\0'); // read until EOF
+        return result;
+    } else {
+        T result;
+        sstr >> result;
+        return result;
+    }
 }
 
 template <class T>
@@ -85,7 +91,6 @@ public:
         if(args.find(argName) != args.end()) {
           throw std::invalid_argument{"Encountered command line argument several times: " + argName};
         }
-
         args[argName] = argVal;
       } else {
         flags.insert(arg);
@@ -189,16 +194,27 @@ private:
       return {props...};
     };
 
+    auto dev_name_selector = [=](const sycl::device& dev){
+    	std::string check_name = dev.get_info<sycl::info::device::name>() + " (" + dev.get_platform().get_info<sycl::info::platform::name>() + ")";
+    	std::cout << "Checking " << device_type << " against " << check_name << " -> " << (device_type == check_name) << std::endl;
+    	return check_name == device_type ? 1 : -1;
+    };
+
+    sycl::device dev;
 
     if(device_type == "cpu") {
-      return sycl::queue{sycl::cpu_selector_v, getQueueProperties()};
+      dev = sycl::device(sycl::cpu_selector_v);
     } else if(device_type == "gpu") {
-      return sycl::queue{sycl::gpu_selector_v, getQueueProperties()};
+      dev = sycl::device(sycl::gpu_selector_v);
     } else if(device_type == "default") {
-      return sycl::queue{getQueueProperties()};
+      dev = sycl::device(sycl::default_selector_v);
     } else {
-      throw std::invalid_argument{"unknown device type: " + device_type};
+      dev = sycl::device(dev_name_selector);
     }
+    
+    std::cout << "Selected device: " << dev.get_info<sycl::info::device::name>() << " (" << dev.get_platform().get_info<sycl::info::platform::name>() << ")" << std::endl;
+    
+    return sycl::queue{dev, getQueueProperties()};
   }
 
   CommandLine cli_parser;
