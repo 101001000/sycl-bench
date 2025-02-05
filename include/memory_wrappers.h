@@ -84,7 +84,11 @@ public:
 
   sycl::buffer<T, Dimensions>& get() const { return *buff; }
 
-  void reset() { buff = nullptr; }
+  void reset() {
+	  //Reset is used to force the writeback, but if we disabled in the buffer in the init function, we need to turn in on again.
+	  buff->set_write_back(true);
+	  buff = nullptr;
+  }
 
 private:
   // Wrap in a shared_ptr to allow default constructing this class
